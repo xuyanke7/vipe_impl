@@ -1,0 +1,15 @@
+{
+    "image1": {
+        "pairgroup": "",
+        "pair": [
+            {
+                "question": "Is the player to the left of the helmet old and Caucasian?",
+                "function": "def execute_command(image):\nimage_patch = ImagePatch(image)\nplayer_patches = image_patch.find(\"player\")\nhelmet_patches = image_patch.find(\"helmet\")\n\nif len(player_patches) == 0 or len(helmet_patches) == 0:\n    return \"No player or helmet found in the image.\"\n\nplayer_patches.sort(key=lambda x: x.horizontal_center)\nplayer_patch = player_patches[0]\nhelmet_patch = helmet_patches[0]\n\nif player_patch.horizontal_center < helmet_patch.horizontal_center:\n    is_old = player_patch.verify_property(\"player\", \"old\")\n    is_caucasian = player_patch.verify_property(\"player\", \"caucasian\")\n    return bool_to_yesno(is_old and is_caucasian)\nelse:\n    return \"No player to the left of the helmet.\""
+            },
+            {
+                "question": "Is there a helmet to the right of a old and caucasian player?",
+                "function": "def execute_command(image):\n    image_patch = ImagePatch(image)\n    player_patches = image_patch.find(\"old caucasian player\")\n    helmet_patches = image_patch.find(\"helmet\")\n\n    # Sort player patches by horizontal position\n    player_patches.sort(key=lambda x: x.horizontal_center)\n\n    # Find the rightmost player patch\n    rightmost_player_patch = player_patches[-1]\n\n    # Check if there is a helmet to the right of the rightmost player patch\n    for helmet_patch in helmet_patches:\n        if helmet_patch.left > rightmost_player_patch.right:\n            return \"yes\"\n\n    return \"no\""
+            }
+        ]
+    }
+}

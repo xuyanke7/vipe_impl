@@ -14,9 +14,10 @@ from tenacity import (
 import const
 from executor import function_with_timeout
 
-# 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
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.api_key = const.API_KEY
+# openai.api_key = "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"
+openai.api_key = "sess-FxwNtOrpPwUgJW0PzjuFD5U2YTq2wUCpxYlHb75P"
 
 
 def parserargs():
@@ -74,7 +75,7 @@ def code_general(dataset: List[dict],
                  model: str,) -> None:
     # {"imageid": "n290131", "question": [{"query": "Is the busy man waiting for a bus?"}, {"query": "Who is waiting for the food truck that is not large?"}, {"query": "Who is sitting?"}, {"query": "Does the side walk have brown color?"}, {"query": "Do the bags made of plastic look white or black?"}, {"query": "Is there a large window or door?"}, {"query": "How big is the window the man is looking through?"}, {"query": "Is the bag on the bench black and small?"}, {"query": "Is the young man to the left or to the right of the bags near the bench?"}, {"query": "What is the sidewalk made of?"}, {"query": "What is that backpack on?"}, {"query": "What bag is to the right of the man that is looking through the window?"}, {"query": "Is the color of the menu the same as the food truck?"}, {"query": "Is the color of the backpack different than the sidewalk?"}, {"query": "Are there both a window and a door?"}, {"query": "Is the large backpack to the right or to the left of the man on the left side?"}, {"query": "Do you see benches near the bags that look white?"}]}
 
-    with open("viper_impl/prompt/chatapi.prompt","r") as f:
+    with open("prompt\chatapi.prompt","r") as f:
         baseprompt = f.read().strip()
     print('----SYSTEM MESSAGE')
     # print(baseprompt)
@@ -92,6 +93,9 @@ def code_general(dataset: List[dict],
             )
             print('----RESPONSE')
             print(res_main)
+            reslist = []
+            reslist.append({"question":item,
+                            "function":res_main})
             break
 
 
@@ -144,23 +148,28 @@ def main(args):
 
     code_general(dataset, args.pass_at_k, log_path, args.model)
 
-def test():
+def testapi():
+    # openai.api_key = ""
     print(openai.api_key)
+    with open("prompt\chatapi.prompt","r") as f:
+        baseprompt = f.read().strip()
+    query = "Is there a helmet to the right of a old and caucasian player?"
     try:
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo",
-            prompt="Say this is a test",
-            max_tokens=100,
-            n=1,
-            stop=None,
-            temperature=0.0,
-        )
+        res_main = gpt_chat(
+                model="gpt-3.5-turbo",
+                sys_msg=baseprompt,
+                user_msg=query,
+            )
+        print('----RESPONSE')
+        print(res_main)
+
+
     except openai.error.OpenAIError as e:
         print(f"OpenAIError: {e}.")
-    print(response.choices[0].message.content)
+    
 
 
 if __name__ == "__main__":
-    # test()
+    testapi()
     args = parserargs()
     main(args)
